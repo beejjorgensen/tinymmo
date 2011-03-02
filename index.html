@@ -10,17 +10,25 @@
   color: green;
   font-weight: bold;
 }
+#status {
+  position: absolute;
+  top:10px; right:5px;
+}
 </style>
 
 <script src="/socket.io/socket.io.js"></script> 
 <script> 
  var socket = new io.Socket(); 
  socket.connect();
- socket.on('connect', function(e){ console.log("connect ", e); }) 
+ socket.on('connect', function(e){ status("Connected"); }) 
  socket.on('message', messageHandler);
- socket.on('disconnect', function(e){ console.log("disconnect", e); }) 
+ socket.on('disconnect', function(e){ status("Disconnected"); }) 
 
 var myPid;
+
+function status(text) {
+ document.getElementById('status').textContent = text;
+}
 
 function getPlayer(pid) {
   return document.getElementById(pid);
@@ -91,3 +99,4 @@ document.addEventListener('keyup', keyHandler, false);
 
 </script> 
 
+<div id="status">Javascript Error</div>
