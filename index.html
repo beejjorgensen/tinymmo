@@ -1,9 +1,10 @@
 <!doctype html>
 <title>TinyMMO Demo</title>
 <style>
-.player {
+* { padding:0px; margin:0px; line-height:1em; font-family:monospace; }
+#map,.player {
   position: absolute;
-  font-size: 4em;
+  font-size: 20px;
 }
 
 .playerself {
@@ -26,32 +27,33 @@
 
 var myPid;
 
-function status(text) {
- document.getElementById('status').textContent = text;
-}
+function $(id)          { return document.getElementById(id); }
+function status(text)   { $('status').textContent = text; }
+function getPlayer(pid) { return $(pid); }
 
-function getPlayer(pid) {
-  return document.getElementById(pid);
-}
+var cellWidth;
 
 var actions = {
   init: function(msg) {
     myPid = msg.pid;
+    $('map').innerText = msg.map.map(function(l) { return l.join(''); }).join('\n');
+    // calculate width of one map char
+    cellWidth = $('map').clientWidth / msg.map[0].length;
   },
 
   updatePlayer: function(msg) {
     var player = getPlayer(msg.pid);
 
     if (!player) {
-      player = document.createElement("div");
+      player = document.createElement("pre");
       player.className = 'player' + (myPid === msg.pid ? ' playerself': '');
       player.id = msg.pid;
       player.textContent = (msg.pid % 10);
       document.body.appendChild(player);
     } 
 
-    player.style.left = msg.x + "em";
-    player.style.top = msg.y + "em";
+    player.style.left = msg.x * cellWidth + 'px';
+    player.style.top = msg.y + 'em';
   },
 
   killPlayer: function(msg) {
@@ -100,3 +102,4 @@ document.addEventListener('keyup', keyHandler, false);
 </script> 
 
 <div id="status">Javascript Error</div>
+<pre id="map"></pre>
