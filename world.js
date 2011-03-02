@@ -1,11 +1,33 @@
 var map=[], maxX=40, maxY=20;
 
+exports.map = map;
+
 var item = {
   EMPTY:' ',
   WALL: '#',
   TRAP: 'v',
   GOLD: '$'
 };
+
+exports.isEmpty = function(x,y) {
+  return map[y][x] === item.EMPTY;
+};
+
+exports.setStartPosition = function(player) {
+  for (var i=0; i<1000; i++) {
+    var x = randX(),
+        y = randY();
+    if (exports.isEmpty(x,y)) {
+      player.x = x;
+      player.y = y;
+      return;
+    }
+  }
+  throw "Could not find empty cell on map";
+};
+
+function randX() { return Math.round(Math.random() * maxX); }
+function randY() { return Math.round(Math.random() * maxY); }
 
 function chooseCell(x,y) {
   if ( x===0 || x===maxX || y===0 || y===maxY ) return item.WALL;
@@ -22,7 +44,4 @@ for (var y = 0; y <= maxY; y++) {
   }
 }
 
-exports.map = map;
-exports.item = item;
-exports.maxX = maxX;
-exports.maxY = maxY;
+

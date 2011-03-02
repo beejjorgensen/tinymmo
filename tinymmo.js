@@ -49,7 +49,7 @@ var actions = {
   "move" : function(client, msg) {
     var newX = client.x + msg.dx,
         newY = client.y + msg.dy;
-    if (world.map[newY][newX] === world.item.EMPTY) {
+    if (world.isEmpty(newX,newY)) {
       client.x = newX;
       client.y = newY;
       forEachClient(function(c) { checkCollision(client, c); });
@@ -73,8 +73,7 @@ var socket = io.listen(server);
 // New client connects
 socket.on('connection', function(client) {
   client.pid = pid;
-  client.x = Math.round(Math.random() * world.maxX);
-  client.y = Math.round(Math.random() * world.maxY);
+  world.setStartPosition(client);
   pid++;
 
   client.send({t: "init", pid: client.pid, map:world.map});
