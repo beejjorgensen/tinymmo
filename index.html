@@ -1,0 +1,94 @@
+<style>
+.player {
+	position: absolute;
+	top: 100px;
+	left: 100px;
+	font-size: 4em;
+}
+
+.playerself {
+	color: green;
+	font-weight: bold;
+	font-size: 4em;
+}
+</style>
+
+<script src="/socket.io/socket.io.js"></script> 
+<script> 
+ var socket = new io.Socket(); 
+ socket.connect();
+ socket.on('connect', function(e){ console.log("connect ", e); }) 
+ socket.on('message', messageHandler);
+ socket.on('disconnect', function(e){ console.log("disconnect", e); }) 
+
+var myPid;
+
+function getPlayer(pid) {
+	return document.getElementById(pid);
+}
+
+var actions = {
+	init: function(msg) {
+		myPid = msg.pid;
+	},
+
+	updatePlayer: function(msg) {
+		var player = getPlayer(msg.pid);
+
+		if (!player) {
+			player = document.createElement("div");
+			player.className = 'player' + (myPid === msg.pid ? ' playerself': '');
+			player.id = msg.pid;
+			player.textContent = (msg.pid % 10);
+			document.body.appendChild(player);
+		} 
+
+		player.style.left = msg.x + "em";
+		player.style.top = msg.y + "em";
+	},
+
+	killPlayer: function(msg) {
+		var player = getPlayer(msg.pid);
+		if (player) {
+			player.textContent = '\u2620';
+		}
+
+		if (msg.pid === myPid) {
+			// do cool stuff
+		}
+	}
+};
+
+function messageHandler(msg) {
+	if (msg.t in actions) {
+		actions[msg.t](msg);
+		console.log(JSON.stringify(msg));
+	} else {
+		console.error("unknown message type: ", msg);
+	}
+}
+
+function send(msg) {
+	socket.send(msg);
+}
+
+function keyHandler(e) {
+	var dx = 0, dy = 0;
+	switch (e.keyCode) {
+		case 37: dx = -1; break;  // Left
+		case 38: dy = -1; break;  // up
+		case 39: dx =  1; break;  // right
+		case 40: dy =  1; break;  // down
+	}
+
+	if (dx || dy) {
+		send({t: "move", dx:dx, dy:dy});
+		e.preventDefault();
+		e.stopPropagation();
+	}
+}
+
+document.addEventListener('keyup', keyHandler, false);
+
+</script> 
+
