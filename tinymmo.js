@@ -1,3 +1,5 @@
+/* vim: set shiftwidth=2 tabstop=2 softtabstop=2 expandtab: */
+
 var http = require('http'),
     fs = require('fs'),
     io = require('socket.io'),
